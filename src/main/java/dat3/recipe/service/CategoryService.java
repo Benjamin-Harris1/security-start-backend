@@ -2,7 +2,9 @@ package dat3.recipe.service;
 
 import dat3.recipe.entity.Category;
 import dat3.recipe.repository.CategoryRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,10 +24,24 @@ public class CategoryService {
     }
 
     // Post category
-    public String addCategory(String category) {
+    public Category addCategory(String category) {
         Category newCategory = new Category(category);
         categoryRepository.save(newCategory);
-        return "Category added";
+        return newCategory;
+    }
+
+    public Category updateCategory(int id, String newName){
+        Category category = categoryRepository.findById(id).orElseThrow();
+        category.setName(newName);
+        categoryRepository.save(category);
+        return category;
+    }
+
+    public void deleteCategory(int id){
+        if (!categoryRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
+        }
+        categoryRepository.deleteById(id);
     }
 }
 
