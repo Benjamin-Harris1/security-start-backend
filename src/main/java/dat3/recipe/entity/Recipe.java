@@ -41,5 +41,9 @@ public class Recipe {
     public void addCategory(Category category) {
         category.addRecipe(this);
     }
+
+    private String owner;
+
+
 }
 
