@@ -61,10 +61,10 @@ public class SecurityConfig {
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/recipes")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/recipes/*")).permitAll()
 
-            // Only USERS can create, edit or delete recipes
+            // Only USERS can create recipes and only OWNERS or ADMINS can edit or delete recipes
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/recipes")).hasAuthority("USER")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/recipes/*")).hasAuthority("USER")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/recipes/*")).hasAuthority("USER")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/recipes/*")).authenticated()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/recipes/*")).authenticated()
 
 
             // Only ADMIN can create, update and delete categories

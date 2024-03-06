@@ -7,6 +7,8 @@ import dat3.recipe.repository.CategoryRepository;
 import dat3.recipe.repository.RecipeRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,6 +24,13 @@ public class RecipeService {
     public RecipeService(RecipeRepository recipeRepository, CategoryRepository categoryRepository) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
+    }
+
+    private boolean isUserAuthorized(String recipeOwner){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
+        return recipeOwner.equals(currentUserName) || isAdmin;
     }
 
     public List<RecipeDto> getAllRecipes(String category) {
@@ -72,6 +81,10 @@ public class RecipeService {
 
         Recipe recipeToEdit = recipeRepository.findById(id).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+        
+        if (!isUserAuthorized(recipeToEdit.getOwner())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to edit this recipe");
+        }
         updateRecipe(recipeToEdit,request, category);
         recipeRepository.save(recipeToEdit);
         return new RecipeDto(recipeToEdit,false);
@@ -79,6 +92,9 @@ public class RecipeService {
 
     public ResponseEntity deleteRecipe(int id) {
         Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+        if (!isUserAuthorized(recipe.getOwner())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this recipe");
+        }
         recipeRepository.delete(recipe);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

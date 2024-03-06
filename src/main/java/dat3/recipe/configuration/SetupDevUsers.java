@@ -1,7 +1,5 @@
 package dat3.recipe.configuration;
 
-import dat3.recipe.entity.SpecialUser;
-import dat3.recipe.repository.SpecialUserRepository;
 import dat3.security.entity.Role;
 import dat3.security.entity.UserWithRoles;
 import dat3.security.repository.RoleRepository;
@@ -40,8 +38,6 @@ public class SetupDevUsers implements ApplicationRunner {
         roleRepository.save(new Role("ADMIN"));
     }
 
-    @Autowired
-    SpecialUserRepository specialUserRepository;
      /*****************************************************************************************
      IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      NEVER  COMMIT/PUSH CODE WITH DEFAULT CREDENTIALS FOR REAL
@@ -71,10 +67,6 @@ public class SetupDevUsers implements ApplicationRunner {
         userWithRolesRepository.save(user2);
         userWithRolesRepository.save(user3);
         userWithRolesRepository.save(user4);
-        SpecialUser specialUser =
-                new SpecialUser("specialUser",pwEncoder.encode(passwordUsedByAll),"s@a.dk","Anders","Hansen","Lyngby vej 23","Lyngby","2800");
-        specialUser.addRole(roleUser);
-        specialUserRepository.save(specialUser);
     }
 
 
